@@ -1,0 +1,10 @@
+dist/
+*.log
+*.pyc
+__pycache__/
+venv/
+extension/schemas/gschemas.compiled
+extension/locale/
+.agents/
+.aws/
+.codex/

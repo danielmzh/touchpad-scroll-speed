@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.touchpad-scroll-speed" path="/org/gnome/shell/extensions/touchpad-scroll-speed/">
+    <key name="scroll-factor" type="d">
+      <default>1.0</default>
+      <range min="0.05" max="1.5"/>
+      <summary>Touchpad scroll speed</summary>
+      <description>Two-finger scroll multiplier, from 5% to 150%. 1.0 keeps normal speed, 0.4 reduces scrolling to 40%, and 1.5 increases it to 150%.</description>
+    </key>
+  </schema>
+</schemalist>

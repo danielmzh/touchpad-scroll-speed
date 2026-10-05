@@ -1,0 +1,153 @@
+# Touchpad Scroll Speed translations.
+# Copyright (C) 2026 danielmzh
+# This file is distributed under the same license as Touchpad Scroll Speed.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Touchpad Scroll Speed 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/danielmzh/touchpad-scroll-speed/issues\n"
+"POT-Creation-Date: 2026-10-04 00:00+0000\n"
+"PO-Revision-Date: 2026-10-04 00:00+0000\n"
+"Last-Translator: danielmzh\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: extension/extension.js:57
+msgid "Touchpad Scroll Speed"
+msgstr ""
+
+#: extension/extension.js:63 extension/prefs.js:21
+msgid "Touchpad scrolling"
+msgstr ""
+
+#: extension/extension.js:72
+msgid "Install the scroll component from the project, then log out and log back in."
+msgstr ""
+
+#: extension/extension.js:73
+msgid "A GNOME Wayland session is required."
+msgstr ""
+
+#: extension/extension.js:85
+msgid "Two-finger scrolling"
+msgstr ""
+
+#: extension/extension.js:101
+msgid "Touchpad scroll speed"
+msgstr ""
+
+#: extension/extension.js:118
+msgid "Slower"
+msgstr ""
+
+#: extension/extension.js:119
+msgid "Faster"
+msgstr ""
+
+#: extension/extension.js:125
+#, javascript-format
+msgid "%s · %s"
+msgstr ""
+
+#: extension/extension.js:132
+msgid "Reset speed"
+msgstr ""
+
+#: extension/extension.js:139
+msgid "Preferences…"
+msgstr ""
+
+#: extension/extension.js:166
+#, javascript-format
+msgid "Touchpad scrolling: %s"
+msgstr ""
+
+#: extension/extension.js:188
+msgid "Could not apply the scroll speed."
+msgstr ""
+
+#: extension/prefs.js:31
+msgid "Settings unavailable"
+msgstr ""
+
+#: extension/prefs.js:32
+msgid "Reinstall the extension to restore the scrolling settings."
+msgstr ""
+
+#: extension/prefs.js:43
+msgid "Scrolling speed"
+msgstr ""
+
+#: extension/prefs.js:44
+msgid "Adjust two-finger scrolling. 100 % is the normal speed."
+msgstr ""
+
+#: extension/prefs.js:68
+msgid "Two-finger scrolling speed; 100 % is the normal speed"
+msgstr ""
+
+#: extension/prefs.js:81
+msgid "Scroll speed"
+msgstr ""
+
+#: extension/prefs.js:82
+#, javascript-format
+msgid "%s: slower · 100 %%: normal · %s: faster"
+msgstr ""
+
+#: extension/prefs.js:114
+msgid "Quick presets"
+msgstr ""
+
+#: extension/prefs.js:123
+#, javascript-format
+msgid "Set scrolling to %s"
+msgstr ""
+
+#: extension/prefs.js:137
+msgid "Reset"
+msgstr ""
+
+#: extension/prefs.js:148
+msgid "Reset scrolling"
+msgstr ""
+
+#: extension/prefs.js:149
+msgid "Restore the normal speed (100 %)."
+msgstr ""
+
+#: extension/prefs.js:160
+msgid "Apply the setting"
+msgstr ""
+
+#: extension/prefs.js:161
+msgid "Install the scroll component from the project, then log out and log back in. Disabling the extension restores normal speed and keeps your setting."
+msgstr ""
+
+#: extension/prefs.js:166
+msgid "Installation instructions"
+msgstr ""
+
+#: extension/prefs.js:171
+msgid "Scroll component"
+msgstr ""
+
+#: extension/prefs.js:172
+msgid "The GNOME Extensions package needs the scroll component installed separately."
+msgstr ""
+
+#: extension/speed.js:11
+msgid "Slow"
+msgstr ""
+
+#: extension/speed.js:12
+msgid "Normal"
+msgstr ""
+
+#: extension/speed.js:13
+msgid "Fast"
+msgstr ""

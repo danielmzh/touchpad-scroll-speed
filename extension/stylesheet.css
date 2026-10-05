@@ -1,0 +1,13 @@
+.touchpad-sensitivity-title {
+    font-weight: bold;
+}
+
+.touchpad-sensitivity-value {
+    min-width: 3.5em;
+    text-align: right;
+}
+
+.touchpad-sensitivity-limits {
+    font-size: 0.85em;
+    padding-top: 0;
+}
