@@ -96,8 +96,8 @@ def inside(base, without_backend=False):
             print('enable_request', evaluate("(async()=> { const Main=await import('resource:///org/gnome/shell/ui/main.js'); await Main.extensionManager._initializationPromise; global.settings.set_boolean('disable-user-extensions',false); return Main.extensionManager.enableExtension('" + UUID + "'); })()"), flush=True)
             deadline = time.monotonic() + 12
             while time.monotonic() < deadline:
-                state = evaluate("(async()=> { const Main=await import('resource:///org/gnome/shell/ui/main.js'); const e=Main.extensionManager.lookup('" + UUID + "'); return {state:e?.state, errors:e?.errors, panel:!!Main.panel.statusArea['" + UUID + "']}; })()")
-                if state.get('panel'):
+                state = evaluate("(async()=> { const Main=await import('resource:///org/gnome/shell/ui/main.js'); const e=Main.extensionManager.lookup('" + UUID + "'); return {state:e?.state, errors:e?.errors, panel:!!Main.panel.statusArea['" + UUID + "'], backendPending:!!e?.stateObj?._backendCancellable}; })()")
+                if state.get('panel') and not state.get('backendPending'):
                     break
                 if state.get('errors'):
                     raise RuntimeError('Extension errors: ' + json.dumps(state))
@@ -114,7 +114,6 @@ def inside(base, without_backend=False):
                 const uuid='touchpad-scroll-speed@danielmzh.github.io';
                 const expectedUi=EXPECTED_UI;
                 let e=Main.extensionManager.lookup(uuid).stateObj;
-                const s=e._settings;
                 const touchpad=new Gio.Settings({schema_id:'org.gnome.desktop.peripherals.touchpad'});
                 const mouse=new Gio.Settings({schema_id:'org.gnome.desktop.peripherals.mouse'});
                 touchpad.set_double('speed',0.27182818);
@@ -127,6 +126,23 @@ def inside(base, without_backend=False):
                 const check=(name,pass,value)=>{ assertions.push({name,pass,value}); if (!pass) throw new Error(name+': '+JSON.stringify(value)); };
                 const near=(a,b)=>Math.abs(a-b)<1e-8;
                 const checkPointers=operation=>check('pointer settings unchanged after '+operation,JSON.stringify(pointerSnapshot())===JSON.stringify(originalPointers),pointerSnapshot());
+                const waitForBackend=async extension=>{
+                    const deadline=GLib.get_monotonic_time()+3000000;
+                    while ((!extension._indicator||extension._backendCancellable)&&GLib.get_monotonic_time()<deadline)
+                        await wait(25);
+                    check('backend detection completes',!!extension._indicator&&extension._backendCancellable===null,[!!extension._indicator,!!extension._backendCancellable]);
+                };
+                // Exercise the lifecycle directly so manager transitions cannot delay it.
+                e.disable();
+                e.enable();
+                const pendingRead=e._backendCancellable;
+                check('backend detection starts asynchronously',!!pendingRead&&!e._backendReady,!!pendingRead);
+                e.disable();
+                check('disable cancels pending backend detection',pendingRead.is_cancelled()&&e._backendCancellable===null&&e._indicator===null,pendingRead.is_cancelled());
+                e.enable();
+                await waitForBackend(e);
+                check('reenable after canceled detection owns two settings signals',e._settingsSignals.length===2,e._settingsSignals.length);
+                const s=e._settings;
                 const leasePath=GLib.build_filenamev([GLib.get_user_runtime_dir(),'touchpad-scroll-speed.factor']);
                 const leaseFile=Gio.File.new_for_path(leasePath);
                 const readLease=()=>{
@@ -203,8 +219,8 @@ def inside(base, without_backend=False):
                 await wait(2300);
                 check('disabled signals and timer stay released',!leaseFile.query_exists(null)&&e._settings===null&&e._settingsSignals===null,[leaseFile.query_exists(null),e._settingsSignals]);
                 Main.extensionManager.enableExtension(uuid);
-                await wait(300);
                 e=Main.extensionManager.lookup(uuid).stateObj;
+                await waitForBackend(e);
                 check('reenable creates new indicator',!!Main.panel.statusArea[uuid]&&e._indicator!==original,!!Main.panel.statusArea[uuid]);
                 check('reenable reads saved factor',near(e._slider.value,(0.33333333-0.05)/1.45),e._slider.value);
                 checkLease('reenable activates saved factor',0.33333333);

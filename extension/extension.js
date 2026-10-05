@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
@@ -29,9 +30,8 @@ export default class TouchpadScrollSpeedExtension extends Extension {
         this._leasePath = GLib.build_filenamev([
             GLib.get_user_runtime_dir(), 'touchpad-scroll-speed.factor',
         ]);
-        const [, maps] = GLib.file_get_contents('/proc/self/maps');
-        this._backendReady = Meta.is_wayland_compositor() &&
-            new TextDecoder().decode(maps).includes('/libtouchpad-scroll.so');
+        this._backendReady = false;
+        this._backendCancellable = null;
 
         try {
             this._buildMenu();
@@ -40,17 +40,51 @@ export default class TouchpadScrollSpeedExtension extends Extension {
                 this._settings.connect('writable-changed::scroll-factor', () => this._sync())
             );
             this._sync();
-            if (this._backendReady) {
-                this._leaseSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 2, () => {
-                    this._writeLease();
-                    return GLib.SOURCE_CONTINUE;
-                });
-            }
             Main.panel.addToStatusArea(this.uuid, this._indicator);
+            this._detectBackend();
         } catch (error) {
             this.disable();
             throw error;
         }
+    }
+
+    _detectBackend() {
+        if (!Meta.is_wayland_compositor())
+            return;
+
+        const cancellable = new Gio.Cancellable();
+        this._backendCancellable = cancellable;
+        Gio.File.new_for_path('/proc/self/maps').load_contents_async(
+            cancellable, (file, result) => {
+                let maps;
+                try {
+                    [, maps] = file.load_contents_finish(result);
+                } catch (error) {
+                    if (this._backendCancellable === cancellable) {
+                        this._backendCancellable = null;
+                        if (!cancellable.is_cancelled())
+                            console.error(`Could not detect the touchpad scroll component: ${error.message}`);
+                    }
+                    return;
+                }
+
+                // A completed read must belong to the current activation.
+                if (cancellable.is_cancelled() || this._backendCancellable !== cancellable)
+                    return;
+
+                this._backendCancellable = null;
+                this._backendReady =
+                    new TextDecoder().decode(maps).includes('/libtouchpad-scroll.so');
+                this._statusItem.actor.visible = !this._backendReady;
+                this._sync();
+                if (this._backendReady) {
+                    this._leaseSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 2, () => {
+                        this._writeLease();
+                        return GLib.SOURCE_CONTINUE;
+                    });
+                }
+            }
+        );
     }
 
     _buildMenu() {
@@ -191,6 +225,8 @@ export default class TouchpadScrollSpeedExtension extends Extension {
     }
 
     disable() {
+        this._backendCancellable?.cancel();
+        this._backendCancellable = null;
         if (this._leaseSource) {
             GLib.Source.remove(this._leaseSource);
             this._leaseSource = 0;
@@ -199,10 +235,15 @@ export default class TouchpadScrollSpeedExtension extends Extension {
             GLib.unlink(this._leasePath);
         this._leasePath = null;
 
-        for (const id of this._settingsSignals ?? [])
-            this._settings.disconnect(id);
+        if (this._settingsSignals) {
+            for (const id of this._settingsSignals)
+                this._settings.disconnect(id);
+        }
         this._settingsSignals = null;
 
+        this._sliderRow?.destroy();
+        this._statusItem?.destroy();
+        this._valueLabel?.destroy();
         this._indicator?.destroy();
         this._indicator = null;
         this._slider = null;

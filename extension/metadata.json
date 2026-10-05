@@ -1,7 +1,7 @@
 {
     "uuid": "touchpad-scroll-speed@danielmzh.github.io",
     "name": "Touchpad Scroll Speed",
-    "description": "Adjust two-finger touchpad scrolling from 5% to 150% in GNOME Shell 48 on Wayland. English and Spanish interface. Requires the native scroll component from the linked project: run its installer, then log out and back in. Installing this extension ZIP alone does not enable scroll adjustment.",
+    "description": "Adjust vertical and horizontal two-finger touchpad scrolling from 5% to 150% on GNOME Shell with Wayland. Choose Slow (40%), Normal (100%), or Fast (150%), or set your own speed. The interface is available in English and Spanish. Mouse wheel scrolling and pointer speed are unchanged.\n\nThe native scroll component is required. Download and extract the complete source release from the linked GitHub project, then run ./install.sh from the project folder without sudo. Log out and log back in, then enable Touchpad Scroll Speed in the Extensions app. Installing this GNOME extension ZIP alone does not enable scroll adjustment.",
     "url": "https://github.com/danielmzh/touchpad-scroll-speed",
     "gettext-domain": "touchpad-scroll-speed",
     "settings-schema": "org.gnome.shell.extensions.touchpad-scroll-speed",
